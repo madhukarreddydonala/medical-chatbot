@@ -1,0 +1,19 @@
+[project]
+name = "medical-chatbot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "madhukarreddydonala", email = "madhukarreddy1744268@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "langchain>=1.4.3",
+]
+
+[project.scripts]
+medical-chatbot = "medical_chatbot:main"
+
+[build-system]
+requires = ["uv_build>=0.12.22,<0.13.0"]
+build-backend = "uv_build"
