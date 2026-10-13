@@ -1,38 +1,25 @@
-from dotenv import load_dotenv
+"""Build or update the Pinecone index from PDFs in the project's data folder."""
+
+from __future__ import annotations
+
 import os
-from src.helper import load_pdf, text_split, download_hugging_face_embeddings
-from pinecone import Pinecone, ServerlessSpec
-from langchain_pinecone import PineconeVectorStore
+from pathlib import Path
 
-load_dotenv()
+from dotenv import load_dotenv
 
-PINECONE_API_KEY = os.environ.get('PINECONE_API_KEY')
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+from src.vector_store import index_documents
 
-os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
-extracted_data = load_pdf('data/')
-text_chunks = text_split(extracted_data)
-embeddings = download_hugging_face_embeddings()
+def main() -> None:
+    load_dotenv()
+    project_dir = Path(__file__).resolve().parent
+    data_dir = Path(os.getenv("PDF_DATA_DIR", str(project_dir / "data")))
+    if not data_dir.is_absolute():
+        data_dir = project_dir / data_dir
+    count = index_documents(str(data_dir))
+    index_name = os.getenv("PINECONE_INDEX_NAME", "medical-bot")
+    print(f"Indexed {count} text chunks into Pinecone index '{index_name}'.")
 
-pc = Pinecone(api_key=PINECONE_API_KEY)
 
-index_name = "medical-bot"
-
-if not pc.has_index(index_name):
-    pc.create_index(
-        name=index_name,
-        dimension=384,
-        metric="cosine",
-        spec=ServerlessSpec(cloud="aws", region="us-east-1"),
-    )
-
-index = pc.Index(index_name)
-
-# Create and store embeddings in Pinecone vector store
-docsearch = PineconeVectorStore.from_documents(
-    documents=text_chunks,
-    index_name=index_name,
-    embedding=embeddings,
-)
+if __name__ == "__main__":
+    main()

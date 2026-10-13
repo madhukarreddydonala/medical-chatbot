@@ -1,7 +1,7 @@
 [project]
 name = "medical-chatbot"
 version = "0.1.0"
-description = "Add your description here"
+description = "A grounded medical information chatbot powered by Groq and Pinecone"
 readme = "README.md"
 authors = [
     { name = "madhukarreddydonala", email = "madhukarreddy1744268@gmail.com" }
@@ -29,9 +29,6 @@ dependencies = [
     "sqlalchemy>=2.1.3",
     "streamlit>=1.65.0",
 ]
-
-[project.scripts]
-medical-chatbot = "medical_chatbot:main"
 
 [build-system]
 requires = ["uv_build>=0.12.22,<0.13.0"]

@@ -1,35 +1,82 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f8f5">
-  <title>CareGuide — Medical Q&amp;A</title>
-  <style>
-    :root{color-scheme:light;--ink:#172822;--muted:#66766e;--green:#1f6a50;--pale:#e8f3ed;--line:#e5eae6;--paper:#fff;--bg:#f7f8f5}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
-    .shell{max-width:1060px;margin:auto;padding:0 28px}.topbar{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:11px;font-weight:750;letter-spacing:-.03em;font-size:19px}.mark{width:36px;height:36px;border-radius:12px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:22px;font-weight:400}.tag{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:6px 11px;background:#fff}
-    main{max-width:780px;margin:0 auto;padding:58px 24px 40px}.intro{text-align:center;margin-bottom:30px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700;color:var(--green)}h1{font-size:clamp(30px,5vw,42px);line-height:1.12;letter-spacing:-.045em;margin:10px 0 12px}.intro p{margin:0;color:var(--muted)}
-    .chat-card{background:var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 35px #253c2b0b;overflow:hidden}.messages{padding:25px;min-height:330px;max-height:52vh;overflow:auto;display:flex;flex-direction:column;gap:18px}.welcome{margin:auto;text-align:center;max-width:430px;color:var(--muted)}.welcome-icon{width:48px;height:48px;background:var(--pale);color:var(--green);border-radius:16px;margin:0 auto 12px;display:grid;place-items:center;font-size:24px}.welcome strong{display:block;color:var(--ink);font-size:16px;margin-bottom:5px}.message{display:flex;gap:10px;align-items:flex-start;max-width:88%}.message.user{align-self:flex-end;flex-direction:row-reverse}.avatar{flex:0 0 30px;height:30px;border-radius:10px;background:var(--pale);color:var(--green);display:grid;place-items:center;font-size:13px;font-weight:700}.user .avatar{background:#edf0ee;color:#45534c}.bubble{padding:11px 14px;border-radius:4px 15px 15px;background:#f3f7f4;white-space:pre-wrap;overflow-wrap:anywhere}.user .bubble{background:var(--green);color:white;border-radius:15px 4px 15px 15px}.error .bubble{background:#fff2ed;color:#8b3c24}.composer{border-top:1px solid var(--line);padding:15px 17px 12px}.input-row{display:flex;gap:10px;align-items:flex-end}.input-row textarea{resize:none;min-height:48px;max-height:140px;flex:1;border:1px solid var(--line);border-radius:13px;padding:13px 14px;font:inherit;color:var(--ink);outline:none}.input-row textarea:focus{border-color:#80a995;box-shadow:0 0 0 3px #1f6a5014}.input-row textarea::placeholder{color:#94a099}.send{height:48px;padding:0 19px;border:0;border-radius:13px;background:var(--green);color:white;font:inherit;font-weight:650;cursor:pointer}.send:hover{background:#18583f}.send:disabled{opacity:.55;cursor:wait}.hint{font-size:11px;color:#87938c;margin:9px 2px 0}.suggestions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:17px 0}.suggestion{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 12px;color:#526159;font:inherit;font-size:12px;cursor:pointer}.suggestion:hover{border-color:#9ab5a5;color:var(--green)}footer{text-align:center;color:#87938c;font-size:11px;margin-top:24px}.typing{color:var(--muted);font-size:13px;padding:8px 3px}.typing::after{content:"";animation:dots 1.1s infinite}@keyframes dots{0%{content:""}30%{content:"."}60%{content:".."}100%{content:"..."}}
-    @media(max-width:600px){.shell{padding:0 17px}.topbar{height:65px}main{padding:39px 0 24px}.messages{padding:18px;min-height:290px;max-height:55vh}.message{max-width:95%}.send{padding:0 14px}.tag{font-size:10px}}
-  </style>
+  <meta name="theme-color" content="#f6f8f5">
+  <meta name="description" content="Ask general health questions and explore answers grounded in a medical reference library.">
+  <title>CareGuide | Medical Q&amp;A</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+  <script src="{{ url_for('static', filename='js/chat.js') }}" defer></script>
 </head>
 <body>
-  <header class="shell topbar"><div class="brand"><span class="mark" aria-hidden="true">✳</span>CareGuide</div><span class="tag">Evidence informed answers</span></header>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="CareGuide home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+        </span>
+        <span>CareGuide</span>
+      </a>
+      <div class="header-note">General medical information</div>
+    </div>
+  </header>
+
   <main>
-    <section class="intro"><div class="eyebrow">Your health questions, thoughtfully answered</div><h1>A little more clarity<br>for your health.</h1><p>Ask a question and get a concise answer grounded in the medical library.</p></section>
-    <section class="chat-card" aria-label="Medical assistant chat">
-      <div id="messages" class="messages" aria-live="polite"><div class="welcome" id="welcome"><div class="welcome-icon" aria-hidden="true">✚</div><strong>How can I help today?</strong>Ask about a health topic, symptom, or medical term.</div></div>
-      <form id="chat-form" class="composer"><div class="input-row"><textarea id="question" rows="1" maxlength="2000" placeholder="Type your question…" aria-label="Your question" required></textarea><button class="send" id="send" type="submit">Send <span aria-hidden="true">↗</span></button></div><div class="hint">Up to 2,000 characters · For general information, not a diagnosis</div></form>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Health information, made clearer
+      </div>
+      <h1 id="page-title">A little more clarity<br>for your health.</h1>
+      <p>Ask a question and get a concise answer based on the medical library, with the source pages shown alongside it.</p>
     </section>
-    <div class="suggestions" aria-label="Example questions"><button class="suggestion">What is blood pressure?</button><button class="suggestion">How does sleep affect health?</button><button class="suggestion">What does inflammation mean?</button></div>
-    <footer>CareGuide can make mistakes. For urgent symptoms or personal medical advice, contact a qualified healthcare professional.</footer>
+
+    <div class="workspace">
+      <section class="chat-card" aria-label="Chat with CareGuide">
+        <div class="chat-topline">
+          <div class="chat-title">
+            <span class="assistant-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <span>CareGuide assistant</span>
+          </div>
+          <span class="chat-meta">Grounded in your medical library</span>
+        </div>
+
+        <div id="conversation" class="conversation" role="log" aria-live="polite" aria-relevant="additions text">
+          <div class="welcome" id="welcome">
+            <span class="assistant-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <div class="welcome-copy"><strong>How can I help today?</strong>Ask about a health topic, a symptom, or a medical term. I’ll look for relevant information in the library.</div>
+          </div>
+        </div>
+
+        <form id="chat-form" class="composer">
+          <div class="input-wrap">
+            <textarea id="question" name="message" rows="1" maxlength="2000" placeholder="Type your question…" aria-label="Your question" required></textarea>
+            <button class="send-button" id="send-button" type="submit">
+              <span>Send</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="composer-foot"><span>General information only · Not a diagnosis</span><span id="character-count">0 / 2,000</span></div>
+        </form>
+      </section>
+
+      <aside class="side-column" aria-label="Question ideas and safety information">
+        <section class="side-card">
+          <h2 class="side-heading"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9L19 16Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Try asking</h2>
+          <div class="prompt-list">
+            <button class="prompt-button" type="button" data-question="What is blood pressure?">What is blood pressure?</button>
+            <button class="prompt-button" type="button" data-question="How does sleep affect health?">How does sleep affect health?</button>
+            <button class="prompt-button" type="button" data-question="What does inflammation mean?">What does inflammation mean?</button>
+          </div>
+        </section>
+        <section class="side-card">
+          <h2 class="side-heading"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s8-4 8-10V5l-8-3-8 3v6c0 6 8 10 8 10Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>A helpful guide</h2>
+          <p class="safety-copy"><strong>CareGuide shares general information from its library.</strong> It can make mistakes and cannot assess your personal health. For medical decisions, speak with a qualified healthcare professional. If symptoms may be urgent, seek local emergency care.</p>
+        </section>
+      </aside>
+    </div>
+    <p class="disclaimer">Your questions are sent to the configured AI service to generate an answer. Don’t include information you don’t want to share.</p>
   </main>
-  <script>
-    const form=document.getElementById('chat-form'),input=document.getElementById('question'),send=document.getElementById('send'),messages=document.getElementById('messages');
-    function addMessage(text,who,extra=''){document.getElementById('welcome')?.remove();const row=document.createElement('div');row.className=`message ${who} ${extra}`;const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=who==='user'?'Y':'✳';const bubble=document.createElement('div');bubble.className='bubble';bubble.textContent=text;row.append(avatar,bubble);messages.append(row);messages.scrollTop=messages.scrollHeight;return row}
-    async function ask(text){const question=text.trim();if(!question||send.disabled)return;addMessage(question,'user');input.value='';input.style.height='';send.disabled=true;const pending=addMessage('Thinking','assistant');pending.querySelector('.bubble').classList.add('typing');try{const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:question})});const data=await response.json();pending.remove();if(!response.ok)throw new Error(data.error||'Something went wrong. Please try again.');addMessage(data.answer||'I could not find an answer to that question.','assistant')}catch(error){pending.remove();addMessage(error.message||'Unable to reach the assistant. Check your connection and try again.','assistant','error')}finally{send.disabled=false;input.focus()}}
-    form.addEventListener('submit',event=>{event.preventDefault();ask(input.value)});input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,140)+'px'});input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();form.requestSubmit()}});document.querySelectorAll('.suggestion').forEach(button=>button.addEventListener('click',()=>ask(button.textContent)));
-  </script>
 </body>
 </html>
