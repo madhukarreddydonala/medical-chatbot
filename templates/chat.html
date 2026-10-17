@@ -49,6 +49,12 @@
           </div>
         </div>
 
+        <div class="key-entry">
+          <label for="groq-api-key">Your Groq API key</label>
+          <input id="groq-api-key" name="groq-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your Groq API key" required>
+          <p>Get a key from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Groq Console</a>. It stays in this page until you close or refresh it, and is sent to the CareGuide server to generate your answer. CareGuide does not save it.</p>
+        </div>
+
         <form id="chat-form" class="composer">
           <div class="input-wrap">
             <textarea id="question" name="message" rows="1" maxlength="2000" placeholder="Type your question…" aria-label="Your question" required></textarea>

@@ -1,0 +1,88 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8f5">
+  <meta name="description" content="Ask general health questions and explore answers grounded in a medical reference library.">
+  <title>CareGuide | Medical Q&amp;A</title>
+  <link rel="stylesheet" href="/static/css/chat.css">
+  <script src="/static/js/chat.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="CareGuide home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+        </span>
+        <span>CareGuide</span>
+      </a>
+      <div class="header-note">General medical information</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Health information, made clearer
+      </div>
+      <h1 id="page-title">A little more clarity<br>for your health.</h1>
+      <p>Ask a question and get a concise answer based on the medical library, with the source pages shown alongside it.</p>
+    </section>
+
+    <div class="workspace">
+      <section class="chat-card" aria-label="Chat with CareGuide">
+        <div class="chat-topline">
+          <div class="chat-title">
+            <span class="assistant-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <span>CareGuide assistant</span>
+          </div>
+          <span class="chat-meta">Grounded in your medical library</span>
+        </div>
+
+        <div id="conversation" class="conversation" role="log" aria-live="polite" aria-relevant="additions text">
+          <div class="welcome" id="welcome">
+            <span class="assistant-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <div class="welcome-copy"><strong>How can I help today?</strong>Ask about a health topic, a symptom, or a medical term. I’ll look for relevant information in the library.</div>
+          </div>
+        </div>
+
+        <div class="key-entry">
+          <label for="groq-api-key">Your Groq API key</label>
+          <input id="groq-api-key" name="groq-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your Groq API key" required>
+          <p>Get a key from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Groq Console</a>. It stays in this page until you close or refresh it, and is sent to the CareGuide server to generate your answer. CareGuide does not save it.</p>
+        </div>
+
+        <form id="chat-form" class="composer">
+          <div class="input-wrap">
+            <textarea id="question" name="message" rows="1" maxlength="2000" placeholder="Type your question…" aria-label="Your question" required></textarea>
+            <button class="send-button" id="send-button" type="submit">
+              <span>Send</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="composer-foot"><span>General information only · Not a diagnosis</span><span id="character-count">0 / 2,000</span></div>
+        </form>
+      </section>
+
+      <aside class="side-column" aria-label="Question ideas and safety information">
+        <section class="side-card">
+          <h2 class="side-heading"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9L19 16Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Try asking</h2>
+          <div class="prompt-list">
+            <button class="prompt-button" type="button" data-question="What is blood pressure?">What is blood pressure?</button>
+            <button class="prompt-button" type="button" data-question="How does sleep affect health?">How does sleep affect health?</button>
+            <button class="prompt-button" type="button" data-question="What does inflammation mean?">What does inflammation mean?</button>
+          </div>
+        </section>
+        <section class="side-card">
+          <h2 class="side-heading"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s8-4 8-10V5l-8-3-8 3v6c0 6 8 10 8 10Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>A helpful guide</h2>
+          <p class="safety-copy"><strong>CareGuide shares general information from its library.</strong> It can make mistakes and cannot assess your personal health. For medical decisions, speak with a qualified healthcare professional. If symptoms may be urgent, seek local emergency care.</p>
+        </section>
+      </aside>
+    </div>
+    <p class="disclaimer">Your questions are sent to the configured AI service to generate an answer. Don’t include information you don’t want to share.</p>
+  </main>
+</body>
+</html>

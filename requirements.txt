@@ -1,11 +1,17 @@
-flask>=3.1
-python-dotenv>=1.2
-langchain-core>=1.0
-langchain-community>=0.4
-langchain-text-splitters>=1.0
-langchain-huggingface>=1.2
-langchain-groq>=1.1
-langchain-pinecone>=0.2
-pinecone>=7.3
-pypdf>=6.0
-sentence-transformers>=5.0
+# Alternative pip install list for the runtime dependencies in pyproject.toml.
+# uv users should run `uv sync` instead so the committed uv.lock is respected.
+flask>=3.1.3
+groq>=0.37.1
+gunicorn>=23.0.0; sys_platform != "win32"
+waitress>=3.0.2
+langchain>=1.4.3
+langchain-community>=0.4.2
+langchain-core>=1.6.6
+langchain-groq>=1.1.3
+langchain-huggingface>=1.2.2
+langchain-pinecone>=0.2.13
+langchain-text-splitters>=1.1.3
+pinecone>=7.3.0
+pypdf>=6.19.0
+python-dotenv>=1.2.4
+sentence-transformers>=6.1.0

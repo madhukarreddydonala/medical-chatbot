@@ -13,20 +13,10 @@ from src.vector_store import get_vector_store
 
 
 @lru_cache(maxsize=1)
-def _get_qa_components():
-    """Build and cache Pinecone retrieval and the Groq-backed answer chain."""
-    required = [
-        key
-        for key in ("PINECONE_API_KEY", "GROQ_API_KEY")
-        if not os.getenv(key)
-    ]
-    if required:
-        raise RuntimeError(
-            "Missing required environment variable(s): " + ", ".join(required)
-        )
-
-    from langchain_groq import ChatGroq
-
+def _get_retriever():
+    """Build and cache Pinecone retrieval components."""
+    if not os.getenv("PINECONE_API_KEY"):
+        raise RuntimeError("Missing required environment variable: PINECONE_API_KEY")
     vector_store = get_vector_store()
     try:
         result_count = int(os.getenv("RETRIEVER_K", "4"))
@@ -34,11 +24,18 @@ def _get_qa_components():
         raise RuntimeError("RETRIEVER_K must be an integer from 1 to 12.") from exc
     if not 1 <= result_count <= 12:
         raise RuntimeError("RETRIEVER_K must be an integer from 1 to 12.")
-    retriever = vector_store.as_retriever(
+    return vector_store.as_retriever(
         search_type="similarity",
         search_kwargs={"k": result_count},
     )
+
+
+def _get_answer_chain(api_key: str):
+    """Create a Groq answer chain using the visitor's key for this request."""
+    from langchain_groq import ChatGroq
+
     llm = ChatGroq(
+        api_key=api_key,
         model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
         temperature=0.1,
         max_tokens=700,
@@ -46,7 +43,7 @@ def _get_qa_components():
         timeout=45,
         max_retries=2,
     )
-    return retriever, ANSWER_PROMPT | llm | StrOutputParser()
+    return ANSWER_PROMPT | llm | StrOutputParser()
 
 
 def _source_details(documents) -> list[dict[str, str | int]]:
@@ -68,9 +65,9 @@ def _source_details(documents) -> list[dict[str, str | int]]:
     return sources
 
 
-def answer_question(question: str) -> dict[str, object]:
+def answer_question(question: str, groq_api_key: str) -> dict[str, object]:
     """Retrieve relevant PDF passages and answer with source references."""
-    retriever, answer_chain = _get_qa_components()
+    retriever = _get_retriever()
     documents = retriever.invoke(question)
     if not documents:
         return {
@@ -94,7 +91,7 @@ def answer_question(question: str) -> dict[str, object]:
         citation_id = source_ids.get((name or "Medical library", page), 1)
         excerpts.append(f"[{citation_id}]\n{document.page_content}")
 
-    answer = answer_chain.invoke(
+    answer = _get_answer_chain(groq_api_key).invoke(
         {"question": question, "context": "\n\n".join(excerpts)}
     )
     return {"answer": answer, "sources": sources}

@@ -5,6 +5,7 @@ const input = document.getElementById("question");
 const sendButton = document.getElementById("send-button");
 const conversation = document.getElementById("conversation");
 const characterCount = document.getElementById("character-count");
+const groqApiKeyInput = document.getElementById("groq-api-key");
 const MAX_CHARS = 2000;
 
 function scrollToLatest() {
@@ -74,6 +75,12 @@ function addPendingMessage() {
 async function ask(questionText) {
   const message = questionText.trim();
   if (!message || sendButton.disabled) return;
+  const groqApiKey = groqApiKeyInput.value.trim();
+  if (!groqApiKey) {
+    groqApiKeyInput.focus();
+    addMessage("Enter your Groq API key above before sending a question.", "assistant", { error: true });
+    return;
+  }
 
   addMessage(message, "user");
   input.value = "";
@@ -85,7 +92,11 @@ async function ask(questionText) {
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Groq-API-Key": groqApiKey,
+      },
       body: JSON.stringify({ message }),
     });
     const result = await response.json().catch(() => ({}));
@@ -138,6 +149,10 @@ input.addEventListener("keydown", (event) => {
 
 document.querySelectorAll("[data-question]").forEach((button) => {
   button.addEventListener("click", () => ask(button.dataset.question || ""));
+});
+
+window.addEventListener("pagehide", () => {
+  groqApiKeyInput.value = "";
 });
 
 updateCharacterCount();

@@ -25,7 +25,11 @@ class ChatRoutesTestCase(unittest.TestCase):
         js_response.close()
 
     def test_health_is_liveness_check(self) -> None:
-        self.assertEqual(self.client.get("/health").json, {"status": "ok"})
+        response = self.client.get("/health")
+        self.assertEqual(response.json, {"status": "ok"})
+        self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+        self.assertIn("default-src 'self'", response.headers["Content-Security-Policy"])
 
     def test_invalid_question_payloads_return_400(self) -> None:
         cases = [
@@ -36,6 +40,11 @@ class ChatRoutesTestCase(unittest.TestCase):
         ]
         self.assertTrue(all(response.status_code == 400 for response in cases))
 
+    def test_chat_requires_a_visitor_groq_key(self) -> None:
+        response = self.client.post("/api/chat", json={"message": "Question"})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Groq API key", response.json["error"])
+
     @patch("app.answer_question")
     def test_chat_returns_answer_and_sources(self, answer_question) -> None:
         answer_question.return_value = {
@@ -44,18 +53,26 @@ class ChatRoutesTestCase(unittest.TestCase):
         }
 
         response = self.client.post(
-            "/api/chat", json={"message": "What is blood pressure?"}
+            "/api/chat",
+            json={"message": "What is blood pressure?"},
+            headers={"X-Groq-API-Key": "test-groq-key"},
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["sources"][0]["page"], 3)
-        answer_question.assert_called_once_with("What is blood pressure?")
+        answer_question.assert_called_once_with(
+            "What is blood pressure?", groq_api_key="test-groq-key"
+        )
 
-    @patch("app.answer_question", side_effect=RuntimeError("Set GROQ_API_KEY."))
+    @patch("app.answer_question", side_effect=RuntimeError("Set PINECONE_API_KEY."))
     def test_configuration_error_is_reported_as_service_unavailable(self, _answer) -> None:
-        response = self.client.post("/api/chat", json={"message": "Question"})
+        response = self.client.post(
+            "/api/chat",
+            json={"message": "Question"},
+            headers={"X-Groq-API-Key": "test-groq-key"},
+        )
         self.assertEqual(response.status_code, 503)
-        self.assertIn("GROQ_API_KEY", response.json["error"])
+        self.assertIn("PINECONE_API_KEY", response.json["error"])
 
 
 if __name__ == "__main__":

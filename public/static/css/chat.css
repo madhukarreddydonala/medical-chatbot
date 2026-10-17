@@ -74,6 +74,13 @@ h1 { margin: 12px 0 9px; font: 700 clamp(31px, 4vw, 43px)/1.12 Manrope, sans-ser
 @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75%, 100% { content: "..."; } }
 @keyframes rise-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
+.key-entry { display: grid; gap: 5px; padding: 12px 20px; border-top: 1px solid #edf1ee; background: #fbfcfb; }
+.key-entry label { color: #40584c; font-size: 11px; font-weight: 700; }
+.key-entry input { width: 100%; border: 1px solid #dfe8e2; border-radius: 9px; padding: 9px 11px; background: #fff; color: var(--ink); font: inherit; font-size: 12px; }
+.key-entry input:focus-visible { outline: 3px solid rgb(23 107 80 / 20%); outline-offset: 1px; }
+.key-entry p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.key-entry a { color: var(--green-dark); }
+
 .composer { border-top: 1px solid #edf1ee; padding: 14px 17px 11px; }
 .input-wrap { display: flex; align-items: flex-end; gap: 10px; border: 1px solid #dfe8e2; border-radius: 15px; padding: 6px 7px 6px 14px; background: #fff; transition: border-color .15s, box-shadow .15s; }
 .input-wrap:focus-within { border-color: #80ad96; box-shadow: 0 0 0 3px rgb(23 107 80 / 8%); }

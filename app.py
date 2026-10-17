@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import logging
 import os
 
@@ -12,9 +13,24 @@ from src.rag import answer_question
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="public/static")
 app.config["MAX_CONTENT_LENGTH"] = 32 * 1024
 app.logger.setLevel(logging.INFO)
+
+
+@app.after_request
+def add_security_headers(response):
+    """Apply browser protections to the page and JSON API responses."""
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    response.headers.setdefault(
+        "Content-Security-Policy",
+        "default-src 'self'; script-src 'self'; style-src 'self'; "
+        "img-src 'self' data:; connect-src 'self'; object-src 'none'; "
+        "base-uri 'self'; frame-ancestors 'none'",
+    )
+    return response
 
 
 @app.get("/")
@@ -31,7 +47,17 @@ def health():
 
 @app.post("/api/chat")
 def chat():
-    """Validate one question and return a grounded answer with source metadata."""
+    """Validate a question and use its visitor-supplied Groq key for one answer."""
+    proxy_token = os.getenv("NETLIFY_PROXY_TOKEN", "")
+    require_proxy = os.getenv("REQUIRE_NETLIFY_PROXY", "0").strip() == "1"
+    if require_proxy and len(proxy_token) < 32:
+        app.logger.error("Netlify proxy authentication is required but not configured securely.")
+        return jsonify({"error": "The chat service is not configured yet."}), 503
+    if proxy_token and not hmac.compare_digest(
+        request.headers.get("X-Netlify-Proxy-Token", ""), proxy_token
+    ):
+        return jsonify({"error": "This endpoint only accepts requests through the site."}), 403
+
     body = request.get_json(silent=True)
     if not isinstance(body, dict):
         return jsonify({"error": "Send a JSON object containing a message."}), 400
@@ -43,8 +69,12 @@ def chat():
     if len(question) > 2000:
         return jsonify({"error": "Please keep your question under 2,000 characters."}), 400
 
+    groq_api_key = request.headers.get("X-Groq-API-Key", "").strip()
+    if not groq_api_key or len(groq_api_key) > 512:
+        return jsonify({"error": "Enter a valid Groq API key to continue."}), 400
+
     try:
-        result = answer_question(question)
+        result = answer_question(question, groq_api_key=groq_api_key)
         return jsonify(result)
     except RuntimeError as exc:
         app.logger.warning("Chat service configuration issue: %s", exc)
@@ -55,8 +85,10 @@ def chat():
 
 
 if __name__ == "__main__":
+    # Flask's built-in server is for local development only. Use a production
+    # WSGI server behind a TLS-terminating proxy for a deployed app.
     app.run(
         host=os.getenv("HOST", "127.0.0.1"),
         port=int(os.getenv("PORT", "5000")),
-        debug=os.getenv("FLASK_DEBUG", "0") == "1",
+        debug=os.getenv("FLASK_DEBUG", "0") == "1" and os.getenv("HOST", "127.0.0.1") in {"127.0.0.1", "localhost"},
     )

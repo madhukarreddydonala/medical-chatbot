@@ -1,2 +1,3 @@
-def main() -> None:
-    print("Hello from medical-chatbot!")
+import langchain
+
+print(langchain.__version__)
